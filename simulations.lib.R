@@ -33,6 +33,32 @@ CMC.sim2 <- function(n = 1000, K = 1000, c = 800){
   
 }
 
+#' @title compCMonteCarlo
+#'
+#' @param shape shape parameters of the Pareto distributions
+#' @param scale scale parameters of the Pareto distributions
+#' @param sampRow one row containing N samples
+#' @param c the right limit threshold
+#' @return the CMC estimate Z
+#' @examples
+#' compCMonteCarlo(c(1,1.1), c(2,2.2), c(20, 25), 21)
+compCMonteCarlo <- function(shape, scale, sampRow, c){
+  
+  z <- 0
+  S <- sum(sampRow)
+  m <- max(sampRow)
+  
+  for (i in 1:length(shape)){
+    
+    z <- z + ppareto(max(c - sum(sampRow[-i]), max(sampRow[-i])), shape[i], scale[i], lower.tail = F)
+    
+  }
+  
+  return(z)
+}
+
+
+
 #' @title CMC.sim
 #'
 #' @param n number of samples drawn
@@ -68,18 +94,39 @@ CMC.sim <- function(n = 2000, N = 10, c = 100, parPars = NULL){
   
 }
 
-compCMonteCarlo <- function(shape, scale, sampRow, c){
+#' @title simErrorRatio
+#'
+#'@description varying c  
+#' @param n vector of sample size
+#' @param N number of factors
+#' @param c right tail threshold
+#' @param parPars a dataframe with the first column the shape and the second column the 
+#' scale of the Pareto distributions.
+#' @param kappa the 
+#' @return list of CMC estimate, Monte Carlo estimate and mean CMC
+#' @examples
+#' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
+simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100){
   
-  z <- 0
-  S <- sum(sampRow)
-  m <- max(sampRow)
+  shapeV <- seq(.8, 1.2, length.out = N)
+  scaleV <- seq(1.8, 2.2, length.out = N)
+  parPars <- data.frame(shapeV, scaleV) 
   
-  for (i in 1:length(shape)){
+  mu <- CMC.sim(1e4, N, c, parPars)$Zbar
+  cmc <- rep(0, length(n))
+  mc <- rep(0, length(n))
+  for (i in 1:length(n)){
     
-    z <- z + ppareto(max(c - sum(sampRow[-i]), max(sampRow[-i])), shape[i], scale[i], lower.tail = F)
+    tmp <- CMC.sim(n[i], N, c, parPars)
+    cmc[i] <- tmp$Zbar
+    mc[i] <- tmp$muHat
     
   }
   
-  return(z)
+  return(list("mu" = mu, "cmc" = cmc, "mc" = mc))
+  
 }
+
+
+
 
