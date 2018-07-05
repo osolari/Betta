@@ -122,7 +122,8 @@ simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100){
   scaleV <- seq(1.8, 2.2, length.out = N)
   parPars <- data.frame(shapeV, scaleV) 
   
-  mu <- CMC.sim(1e4, N, c, parPars)$Zbar
+  mu <- CMC.sim(1e5, N, c, parPars)$Zbar
+  
   cmc <- rep(0, length(n))
   mc <- rep(0, length(n))
   for (i in 1:length(n)){
