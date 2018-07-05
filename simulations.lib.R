@@ -69,7 +69,7 @@ compCMonteCarlo <- function(shape, scale, sampRow, c){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-CMC.sim <- function(n = 2000, N = 10, c = 100, parPars = NULL){
+CMC.sim <- function(n = 2000, K = 1000, N = 10, c = 100, parPars = NULL){
   
   
   if (is.null(parPars)){
@@ -79,15 +79,25 @@ CMC.sim <- function(n = 2000, N = 10, c = 100, parPars = NULL){
     parPars <- data.frame(shapeV, scaleV) 
   }
   
-  dat <- data.frame(apply(parPars, 1, function(x){return(rpareto(n, x[1], x[2]))}))
+  Zbar <- rep(0,K)
+  muBar <- rep(0,K)
   
-  Z <- rep(0, n)
-  muHat <- 0
+  for (k in 1:K){
   
-  for (i in 1:n){
+    dat <- data.frame(apply(parPars, 1, function(x){return(rpareto(n, x[1], x[2]))}))
+  
+    Z <- 0
+    muHat <- 0
+  
+    for (i in 1:n){
     
-    Z[i] <- compCMonteCarlo(shapeV, scaleV, dat[i,], c)
-    muHat <- muHat + as.numeric(sum(dat[i,]) > c)
+      Z <- Z + compCMonteCarlo(shapeV, scaleV, dat[i,], c)
+      muHat <- muHat + as.numeric(sum(dat[i,]) > c)
+    }
+  
+    Zbar[k] <- Z/n
+    muBar[k] <- muHat/n
+    
   }
   
   return(list("Z" = Z, "muHat" = muHat/n, "Zbar" = mean(Z)))
