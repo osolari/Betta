@@ -69,7 +69,7 @@ compCMonteCarlo <- function(shape, scale, sampRow, c){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-CMC.sim <- function(n = 2000, K = 1000, N = 10, c = 100, parPars = NULL){
+CMC.sim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
   
   
   if (is.null(parPars)){
@@ -100,7 +100,7 @@ CMC.sim <- function(n = 2000, K = 1000, N = 10, c = 100, parPars = NULL){
     
   }
   
-  return(list("Z" = Z, "muHat" = muHat/n, "Zbar" = mean(Z)))
+  return(list("Zbar" = Zbar, "muBar" = muBar))
   
 }
 
@@ -129,11 +129,11 @@ simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100){
     
     tmp <- CMC.sim(n[i], N, c, parPars)
     cmc[i] <- tmp$Zbar
-    mc[i] <- tmp$muHat
+    mc[i] <- tmp$muBar
     
   }
   
-  return(list("mu" = mu, "cmc" = cmc, "mc" = mc))
+  return(list("n" = n, "mu" = mu, "cmc" = cmc, "mc" = mc, "N" = N, "c" = c))
   
 }
 
