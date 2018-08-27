@@ -1,6 +1,6 @@
 library(actuar)
 set.seed(1)
-random.sample <- function(c){
+randomSample <- function(c){
   
   S <- 0
   n <- 0
@@ -14,14 +14,14 @@ random.sample <- function(c){
   return(n)
 }
 
-CMC.sim2 <- function(n = 1000, K = 1000, c = 800){
+CMCSim2 <- function(n = 1000, K = 1000, c = 800){
   
   theta <- rep(0, K)
   for (k in 1:K){
     P <- rep(0, n)
     for (j in 1:n){
       
-      m <- random.sample(c)
+      m <- randomSample(c)
       P[j] <- ppois(m - 1, 5, lower.tail = FALSE)
       
     }
@@ -60,7 +60,8 @@ compCMonteCarlo <- function(shape, scale, sampRow, c){
 
 
 #' @title CMC.sim
-#'
+#' 
+#' @param K number of Zbars
 #' @param n number of samples drawn
 #' @param N number of factors
 #' @param c right tail threshold
@@ -69,7 +70,7 @@ compCMonteCarlo <- function(shape, scale, sampRow, c){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-CMC.sim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
+CMCSim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
   
   
   if (is.null(parPars)){
@@ -86,17 +87,17 @@ CMC.sim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
   
     dat <- data.frame(apply(parPars, 1, function(x){return(rpareto(n, x[1], x[2]))}))
   
-    Z <- 0
-    muHat <- 0
+    ZSum <- 0
+    muHatSum <- 0
   
     for (i in 1:n){
     
-      Z <- Z + compCMonteCarlo(shapeV, scaleV, dat[i,], c)
-      muHat <- muHat + as.numeric(sum(dat[i,]) > c)
+      ZSum <- ZSum + compCMonteCarlo(shapeV, scaleV, dat[i,], c)
+      muHatSum <- muHatSum + as.numeric(sum(dat[i,]) > c)
     }
   
-    Zbar[k] <- Z/n
-    muBar[k] <- muHat/n
+    Zbar[k] <- ZSum/n
+    muBar[k] <- muHatSum/n
     
   }
   
@@ -116,13 +117,13 @@ CMC.sim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100){
+simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100, kappa = .5){
   
   shapeV <- seq(.8, 1.2, length.out = N)
   scaleV <- seq(1.8, 2.2, length.out = N)
   parPars <- data.frame(shapeV, scaleV) 
   
-  mu <- CMC.sim(1e5, N, c, parPars)$Zbar
+  mu <- mean(CMCSim(1e2, N, c, parPars)$Zbar)
   
   cmc <- rep(0, length(n))
   mc <- rep(0, length(n))
