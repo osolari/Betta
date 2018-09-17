@@ -117,27 +117,32 @@ CMCSim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-simErrorRatio <- function(n = seq(10, 10000, by = 1000), N = 10, c = 100, kappa = .5){
+simErrorRatio <- function(n = 2^(seq(1,10)), N = 10, c = 100, K = 100, kappa = .05){
   
   shapeV <- seq(.8, 1.2, length.out = N)
   scaleV <- seq(1.8, 2.2, length.out = N)
   parPars <- data.frame(shapeV, scaleV) 
   
-  mu <- mean(CMCSim(1e2, N, c, parPars)$Zbar)
+  print("Estimating mu")
+  
+  mu <- CMCSim(1e5, N, c, parPars, K = 1)$Zbar
   
   cmc <- rep(0, length(n))
   mc <- rep(0, length(n))
+  PRatio <- rep(0, length(n))
   for (i in 1:length(n)){
+    print(paste("n = ", n[i]))
+    tmp <- CMCSim(n[i], N, c, parPars, K)
+    cmc[i] <- mean(tmp$Zbar)
+    mc[i] <- mean(tmp$muBar)
     
-    tmp <- CMC.sim(n[i], N, c, parPars)
-    cmc[i] <- tmp$Zbar
-    mc[i] <- tmp$muBar
-    
+    PRatio[i] <- log(sum(abs(tmp$Zbar - mu) > kappa * mu)/K)/(sum(abs(tmp$muBar - mu) > kappa * mu)/K)
   }
   
-  return(list("n" = n, "mu" = mu, "cmc" = cmc, "mc" = mc, "N" = N, "c" = c))
+  return(list("PRatio"= PRatio, "n" = n, "mu" = mu, "cmc" = cmc, "mc" = mc, "N" = N, "c" = c))
   
 }
+
 
 
 
