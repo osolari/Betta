@@ -92,7 +92,7 @@ CMCSim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
   
     for (i in 1:n){
     
-      ZSum <- ZSum + compCMonteCarlo(shapeV, scaleV, dat[i,], c)
+      ZSum <- ZSum + compCMonteCarlo(parPars$shapeV, parPars$scaleV, dat[i,], c)
       muHatSum <- muHatSum + as.numeric(sum(dat[i,]) > c)
     }
   
@@ -125,7 +125,7 @@ simErrorRatio <- function(n = 2^(seq(1,10)), N = 10, c = 100, K = 100, kappa = .
   
   print("Estimating mu")
   
-  mu <- CMCSim(1e5, N, c, parPars, K = 1)$Zbar
+  mu <- CMCSim(2e5, N, c, parPars, K = 1)$Zbar
   
   cmc <- rep(0, length(n))
   mc <- rep(0, length(n))
