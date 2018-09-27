@@ -13,7 +13,7 @@ randomSample <- function(c){
   
   return(n)
 }
-
+  
 CMCSim2 <- function(n = 1000, K = 1000, c = 800){
   
   theta <- rep(0, K)
@@ -117,7 +117,7 @@ CMCSim <- function(n = 200, N = 10, c = 100, parPars = NULL, K = 100){
 #' @return list of CMC estimate, Monte Carlo estimate and mean CMC
 #' @examples
 #' CMC.sim(n = 2000, N = 10, c = 100, parPars = NULL)
-simErrorRatio <- function(n = 2^(seq(1,5)), N = 10, c = 100, K = 100, kappa = .05){
+simErrorRatio <- function(n = 2^(seq(1,10)), N = 10, c = 100, K = 100, kappa = .05){
   
   shapeV <- seq(.8, 1.2, length.out = N)
   scaleV <- seq(1.8, 2.2, length.out = N)
