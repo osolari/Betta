@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import pareto
 from scipy.stats._distn_infrastructure import rv_continuous
 
-from typing import List
+from typing import List, Union
 
 
 class ConditionalMonteCarlo:
@@ -21,8 +21,8 @@ class ConditionalMonteCarlo:
     @classmethod
     def construct_pareto_distributions(
         cls,
-        shapes: List[float] = None,
-        scales: List[float] = None,
+        shapes: Union[List[float], numpy.ndarray] = None,
+        scales: Union[List[float], numpy.ndarray] = None,
         num_rvs: int = 10,
     ):
         """
@@ -112,7 +112,7 @@ class CMC:
         else:
             self.scale = scale
 
-        assert isinstance(n, int), "n must be an integer."
+        assert int(n) == n, "n must be an integer."
 
         self.c = c
         self.N = len(self.shape)
@@ -134,7 +134,7 @@ class CMC:
 
         def compZi(i, sample, c, shapei, scalei):
 
-            ix = range(i) + range(i + 1, sample.shape[0])
+            ix = list(range(i)) + list(range(i + 1, sample.shape[0]))
             return pareto.sf(
                 np.max(
                     np.concatenate(
